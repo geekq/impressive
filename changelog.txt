@@ -1,0 +1,168 @@
+0.10.2 [2008-02-03]
+- --listtrans now shows which transitions are enabled by default
+- number of digits in pdftoppm output file names is cached
+- using xrandr to get current resolution on X11
+- enabled URL hyperlinks using ShellExecute (Win32) or fd.o's xdg-open (UNIX)
+- 'keys' PageProp for arbitrary key bindings
+- exceptions in info scripts are now non-fatal
+- 'video' PageProp and PlayVideo() function for (HIGHLY EXPERIMENTAL!!!)
+  fullscreen video playback
+- PDF parser now emits warnings instead of failing silently if something
+  isn't OK
+- support for list files using the @filename syntax
+- 'comment' PageProp displays overlay text on a slide permanently
+- added auto-overview mode (idea by Tobias Maier)
+- restore compatibility with KeyJnoteGUI
+
+
+0.10.1a [2007-11-27]
+- restored compatibility with poppler-based pdftoppm
+- added Alt+Tab as alias for "exit fullscreen mode"
+- improved cleanup code
+
+
+0.10.1 [2007-09-09]
+- re-enabled GL_ARB_texture_non_power_of_two support (was broken in 0.10.0)
+- PDF hyperlink support
+- added compatibility fix for PyOpenGL 3.x
+- generalized and simplified PageProp system
+- rotate PageProp
+- multi-file support
+- persistent cache
+
+
+0.10.0 [2007-06-02]
+- added pdftoppm rendering backend
+- overview page update fix
+- more font search paths (DejaVuSans.ttf, OSX paths)
+- graceful handling of failed renders
+- converted logo to PNG
+- fixed -T0 crash
+- allowed None as a value for the 'transition' PageProp and -t parameter
+- added 'transtime' PageProp to set transition duration for single pages
+- R key: reset timer
+- added 'progress' PageProp to show/hide progress bar
+- added 'reset' PageProp to reset the timer when the page is left
+- allowed special value FirstTimeOnly for the 'reset' prop
+- L key: return to last (= most recently used) page or back
+- added OnEnter, OnLeave, OnEnterOnce and OnLeaveOnce page props
+- customizable OSD layout and alpha
+- I and O keys change 'skip' and 'overlay' PageProps interactively
+- now accepting image file names at the command line
+- fixed supersample mode
+- added key repeat to quickly change the spotlight size via the keyboard
+- Home and End keys now navigate to the start and end of the presentation
+- shortcut function for any unused letter, number or function key
+- removed PagePeel from the default transitions list
+- two new families of transitions: {Slide,Squeeze}{Left,Right,Up,Down}
+
+
+0.9.4 [2007-03-19]
+- middle mouse button now acts as overview toggle
+- automatic display mode guessing now implemented on Unix, too
+- fixed 'T' key
+- fixed crash in the OSD code if a broken version of PIL is used
+- added gamma controls (courtesy of Luke Campagnola)
+- added progress bar / estimated duration
+- added loadable cursor image
+
+
+0.9.3 [2007-02-26]
+- fixed indentation bug (removing a box caused a transition to the prev page)
+- improved pdftk parser (handles non-ASCII characters gracefully)
+- all messages are redirected to stderr
+- added timer ([T] key) and time tracking mode
+- made all main keyboard bindings unicode key queries
+
+
+0.9.2 [2007-02-17]
+- fixed memory cache
+- added "polling" option
+- added "cache range" option
+- added overview page OSD
+
+
+0.9.1 [2007-01-24]
+- FIX: 'whitening' mode didn't work with GL_EXT_texture_rectangle
+- FIX: crash when clicking a mouse button in fade mode
+- FIX: occasionally left behind temp files
+
+
+0.9.0 [2007-01-07]
+- fixed all OpenGL calls to use the explicit form (glTexCoord2d instead of
+  glTexCoord)
+- corrected texture target specification for rare transitions
+- added unicode key aliases for the [+] and [-] keys (should improve i18n)
+- added "fade to solid color" feature
+- added 'skip' PageProp
+- improved/fixed window caption in overview mode
+- GhostScript is now called with -dUseCropBox, should improve handling of
+  some LaTeX-beamer generated PDFs
+- using a temp file for the page cache now
+- added background rendering
+- Win32: true fullscreen by default
+
+
+0.8.3 [2006-09-28]
+- 'overview' PageProp to remove pages from the overview screen
+- experimental aspect ratio option
+- new transition contributed by Ronan Le Hy
+- OpenGL non-power-of-two texture size extension support
+
+
+0.8.2 [2006-07-13]
+- fixed crash on some files
+- added overview mode keyboard navigation
+- added "--rotate" option
+
+
+0.8.1 [2006-02-04]
+- made OpenGL error reporting more concise
+- added "render" option to produce PNG files from a PDF
+
+
+0.8.0 [2005-11-23]
+- fixed command-line option parser
+- changed some cmdline options (see documentation or -h)
+- added new --transition option to specify which transitions can be chosen
+  randomly
+- added some new transitions from Rob Reid
+- fixed image file mode
+- fixed display of portrait images or pages
+- added experimental 2x zoom mode
+
+
+0.7.2 [2005-10-24]
+- fixed two annoying bugs introduced in 0.7.1, related to mouse key
+  remapping
+- fixed bug that caused parts of the old page content to be visible after
+  transitions
+- added two slideshow-related options
+
+
+0.7.1 [2005-10-22]
+- more intuitive highlight box handling (the middle mouse button is no
+  longer used to create and destroy highlight boxes; instead, dragging
+  the mouse while LMB is pressed creates a box and clicking with RMB deletes
+  a box)
+- added 'initial page number' option (-i)
+
+
+0.7.0 [2005-09-29]
+- fixed bug in overview page that caused the program to crash if the user
+  clicked outside the area occupied by thumbnails
+- added 'timeout' PageProp to automatically advance to the next page
+- added EXPERIMENTAL support for sound via 'sound' PageProp 
+
+
+0.6.3 [2005-09-07]
+- Some PDF files generated by pdflatex would not play because of negative
+  object counts. Fixed.
+
+
+0.6.2 [2006-09-06]
+- bugfix: filenames with spaces didn't work on Win32
+
+
+0.6.1 [2005-09-05]
+- initial public release

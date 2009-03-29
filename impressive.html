@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<title>Impressive Documentation</title>
+<meta http-equiv="text/html; charset=iso-8859-1" />
+</head><body>
+
+<h1>Impressive Documentation</h1>
+<!--VERSION-->
+<p style="text-indent:0;">
+<a href="http://impressive.sourceforge.net/">http://impressive.sourceforge.net/</a><br />
+<b>Version:</b> 0.10.2<br />
+<b>Author:</b> <a href="mailto:martin.fiedler@gmx.net">Martin J. Fiedler</a><br />
+<b>Last updated:</b> 2008-05-24</p>
+<!--END-->
+<!--man
+.TH IMPRESSIVE 1 2008-05-24 "Martin J. Fiedler" "Impressive Documentation">
+.SH "NAME"
+Impressive \- presentation tool with eye candy
+.SH "SYNOPSIS"
+.IX Header "SYNOPSIS"
+.B impressive
+[OPTIONS...] FILES...
+-->
+
+<h2><a name="toc"></a>Table Of Contents</h2>
+
+<ol>
+<li><a href="#desc">Description</a></li>
+<li><a href="#req">Requirements</a></li>
+<li><a href="#install">Installation</a></li>
+<li><a href="#cli">Command Line Parameters</a></li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#scripts">Info Scripts</a></li>
+<li><a href="#misc">Other Useful Information</a></li>
+</ol>
+
+<!-------------------------------------------------------------------------------->
+
+<!--man:on-->
+<h2><a name="desc"></a>Description</h2>
+
+<p>Impressive is a simple presentation program that displays slideshows of image files (JPEG, PNG, TIFF and BMP) or PDF documents. Rendering is done via OpenGL, which allows for some &ldquo;eye candy&rdquo; effects.</p>
+<!--man:off-->
+
+<!-------------------------------------------------------------------------------->
+
+<h2><a name="req"></a>Requirements</h2>
+
+<p>The following software packages are required or recommended to use Impressive:</p>
+<ul>
+<li><strong>Python</strong> 2.3, 2.4 or 2.5 &mdash; <a href="http://www.python.org/">www.python.org</a> <em>(required)</em></li>
+<li><strong>PyOpenGL</strong> (the OpenGL binding for Python) &mdash; <a href="http://pyopengl.sourceforge.net/">pyopengl.sourceforge.net</a> <em>(required)</em></li>
+<li><strong>PyGame</strong> (the SDL binding for Python) &mdash; <a href="http://www.pygame.org/">www.pygame.org</a> <em>(required)</em></li>
+<li><strong>PIL</strong>, the Python Imaging Library &mdash; <a href="http://www.pythonware.com/products/pil/">www.pythonware.com/products/pil</a> <em>(required)</em></li>
+<li><strong>Xpdf</strong> for PDF rendering &mdash; <a href="http://www.foolabs.com/xpdf/">www.foolabs.com/xpdf/</a> <em>(strongly recommended)</em></li>
+<li><strong>GhostScript</strong> for alternate PDF rendering &mdash; <a href="http://www.cs.wisc.edu/~ghost/">www.cs.wisc.edu/~ghost</a> <em>(optional if Xpdf is present, strongly recommended if it's not)</em></li>
+<li><strong>pdftk</strong> for retrieving PDF metadata (page titles, hyperlinks) &mdash; <a href="http://www.accesspdf.com/pdftk/">www.accesspdf.com/pdftk</a> <em>(optional, recommended)</em></li>
+<li><strong>xdg-utils</strong> for starting web or e-mail hyperlinks from PDF documents &mdash; <a href="http://portland.freedesktop.org/">portland.freedesktop.org</a> <em>(optional, not required on Win32)</em></li>
+<li><strong>MPlayer</strong> for sound and video playback &mdash; <a href="http://www.mplayerhq.hu/">www.mplayerhq.hu</a> <em>(optional)</em></li>
+</ul>
+
+<p><b>Debian</b> users can install all these packages at once by typing<br />
+<code style="white-space:pre;">    aptitude install python python-opengl python-pygame python-imaging xpdf-reader gs pdftk xdg-utils mplayer</code></p>
+<p><b>Windows</b> users can download a &ldquo;batteries included&rdquo; ZIP file containing all necessary libraries instead of the standard source code distribution of Impressive.</p>
+
+<p>In addition to these software requirements, the following hardware requirements exist:</p>
+<ul>
+<li>a moderately fast graphics accelerator card or chip <em>with hardware OpenGL support</em> (GeForce2- and i810-level hardware is sufficient)</li>
+<li>a fast processor (numerical calculations in Python are really slow, so the CPU clock should be well above 1 GHz)</li>
+<li>a lot of free disk space (depending on the length of the presentation being shown)</li>
+</ul>
+
+<!-------------------------------------------------------------------------------->
+
+<h2><a name="install"></a>Installation</h2>
+
+<p>The installation procedure differs between Windows and Unix-like systems.</p>
+
+<h3>Generic Installation</h3>
+
+<p>After installing the prerequisites mentioned in the last chapter, extract the file <code>impressive.py</code> from the downloadable archive. You can either start it directly or copy it to some location in your $PATH (<code>~/bin</code> or <code>/usr/local/bin</code> are good candidates).</p>
+
+<p>To start a presentation, simply type something like<br />
+<code style="white-space:pre;">    impressive.py demo.pdf</code></p>
+
+<h3>Windows Installation</h3>
+
+<p>Download the ZIP file of the Windows version and extract it into a folder of your choice. There is an executable file called <code>impressive.exe</code> in this directory. You can either directly drop PDF files or directories containing image files on this .exe in Explorer, or you install a link to <code>impressive.exe</code> in your &ldquo;Send To&rdquo; Menu (usually <code>C:\Documents and Settings\<em>YourNameHere</em>\SendTo</code>). Using the latter method, you can start a presentation by right-clicking a PDF file and selecting &ldquo;Send To / Impressive&rdquo;.</p>
+
+<h3>MacOS X Installation</h3>
+
+<p>On OS X, an update of the Python version that came with the operating system may be required, as well as an installation of the PyGame and PyOpenGL packages. Prebuilt packages for this purpose are available at <a href="http://pythonmac.org/packages/py24-fat/index.html">http://pythonmac.org/packages/</a>. Xpdf, GhostScript and pdftk for the Mac are available via <a href="http://www.finkproject.org/">Fink</a> (packages <code>xpdf</code>, <code>ghostscript</code>, <code>ghostscript-fonts</code> and <code>pdftk</code>).</p>
+
+<h3>Prebuilt Packages</h3>
+
+<p>Some Linux Distributions are already including Impressive into their standard package repositories. For example, if you are using Debian or Gentoo, you may succeed installing the program with a mere <code>apt-get install impressive</code> or <code>emerge impressive</code>. However, note that these packages are not mainained by the program's author and may be outdated.</p>
+
+<!-------------------------------------------------------------------------------->
+
+<h2><a name="cli"></a>Command Line Parameters</h2>
+
+<p>When used from the command line (some terminal and shell in Unix, <code>cmd.exe</code> on Windows), Impressive accepts a range of command-line options in GNU getopt syntax.</p>
+
+<p>The following options are available (in alphabetical order):</p>
+<dl>
+
+<!--man:on:head="Options"-->
+<dt><code>-a <em>&lt;seconds&gt;</em></code> or <code>--auto <em>&lt;seconds&gt;</em></code></dt>
+<dd>Automatically advance to the next page after the given number of seconds. Together with the <code>-w</code> option (described below), this can be used to create automatic slideshows.</dd>
+
+<dt><code>-A <em>&lt;X&gt;</em>:<em>&lt;Y&gt;</em></code> or <code>--aspect <em>&lt;X&gt;</em>:<em>&lt;Y&gt;</em></code></dt>
+<dd>Specifies the display aspect ratio. Normally, Impressive assumes that the pixel aspect ratio is 1:1 (square pixels), regardless of the display resolution that has been set up. If a resolution has been selected that doesn't match the display's aspect ratio, the screen will be distorted. To overcome this, this option may be used to manually specify the display aspect ratio, e.g. &raquo;-A 16:9&laquo;. Note that this option has no effect if Xpdf is used for rendering.</dd>
+
+<dt><code>-b</code> or <code>--noback</code></dt>
+<dd>Disabled background rendering. By default, Impressive will pre-render all pages in a separate background thread while the presentation runs. If this option is specified, it will instead render all pages immediately on startup. This option has no effect if caching is disabled (<code>--cache none</code>, see below).</dd>
+
+<dt><code>-B <em>&lt;ms&gt;</em></code> or <code>--boxfade <em>&lt;ms&gt;</em></code></dt>
+<dd>Sets the duration (in milliseconds) of the highlight box fade-in/fade-out animation. Default value: 100 ms.</dd>
+
+<dt><code>-c <em>&lt;mode&gt;</em></code> or <code>--cache <em>&lt;mode&gt;</em></code></dt>
+<dd>Specifies the page cache mode to use. Valid options are:<dl>
+<dt><code>none</code></dt><dd>Disables page caching altogether, only the current and the following page will be kept in RAM. Jumping between pages will be very slow, because Impressive will need to render the requested pages on the fly. In addition, the overview page won't be complete until every page has been shown at least once.</dd>
+<dt><code>memory</code></dt><dd>Caches all page images in memory. This is the fastest method, but it requires very large amounts of memory (about 3 MiB per page at 1024x768 resolution).</dd>
+<dt><code>disk</code></dt><dd>Like above, but uses a temporary file rather than memory for storage. This is the default.</dd>
+<dt><code>persistent</code></dt><dd>Uses a permanent cache file for caching. This file will not be deleted when Impressive quits and will be reused on subsequent invocations. The default name for the cache file is derived like the names for Info Scripts (see below for an explanation), but with a <code>.cache</code> file name extension instead of <code>.info</code>. This method is a little bit slower than <code>disk</code> mode, but the time span until the overview page is fully populated will be significantly decreased if Impressive is ran again with the same input files and options.</dd>
+</dl>The mode name may be abbreviated at will, down to one character. Thus, <code>--cache persistent</code>, <code>-c persist</code> and even <code>-cp</code> are all synonyms.</dd>
+
+<dt><code>-C <em>&lt;filename&gt;</em>[:<em>&lt;X&gt;</em>,<em>&lt;Y&gt;</em>]</code> or <code>--cursor <em>&lt;filename&gt;</em>[:<em>&lt;X&gt;</em>,<em>&lt;Y&gt;</em>]</code></dt>
+<dd>This option can be used to specify the path to an image file (typically a transparent .png) that shall be used as the mouse cursor instead of the default one. Optionally, the hotspot may be specified (this is the position inside the cursor image where the real mouse position is located). Example: <code>--cursor mycursor.png:2,4</code></dd>
+
+<dt><code>-d <em>&lt;time&gt;</em></code> or <code>--duration <em>&lt;time&gt;</em></code></dt>
+<dd>Specifies the expected run time of the presentation. The <em>time</em> parameter can be either a number of seconds or a human-readable time like <code>1:23</code> (1 minute and 23 seconds), <code>4:56h</code> (4 hours and 56 minutes), <code>3m45s</code> (3 minutes and 45 seconds), <code>5m</code> (5 minutes) or <code>1:23:45</code> (1 hour, 23 minutes and 45 seconds).<br />
+If an expected duration is specified, Impressive will show a semi-transparent green progress bar at the lower edge of the screen, indicating how much time has already passed. If the time is up, the bar will occupy the whole edge and fade to yellow (at 125% of the expected time) to red (at 150% or more).</dd>
+
+<dt><code>-D <em>&lt;ms&gt;</em></code> or <code>--mousedelay <em>&lt;ms&gt;</em></code></dt>
+<dd>Sets the time (in milliseconds) the mouse cursor is shown in fullscreen mode if it is not moved. Default value: 3000 ms.</dd>
+
+<dt><code>-e</code> or <code>--noext</code></dt>
+<dd>OpenGL normally only supports textures with power-of-two dimensions. This means that for a 1024x768 screen, the actual texture size will be 1024x1024, for 1600x1200 it will even be 2048x2048. To overcome this limit and save texture memory, Impressive will automatically use the OpenGL extensions <code>GL_ARB_texture_rectangle</code> (available on most graphics cards) or <code>GL_ARB_texture_non_power_of_two</code> (available on modern graphics cards with current drivers). If these cause any trouble, the <code>-e</code> option may be used to prevent Impressive from using the problematic extensions.</dd>
+
+<dt><code>-f</code> or <code>--fullscreen</code></dt>
+<dd>Toggles fullscreen mode. By default, fullscreen mode is activated, and can be deactivated using this switch.<br />
+<!--man:off-->
+<strong>Note:</strong> On Windows systems, toggling fullscreen mode while Impressive runs does <em>not</em> work. So, this option is the only way to set whether fullscreen mode shall be used or not.
+<!--man:on-->
+</dd>
+
+<dt><code>-F <em>&lt;file&gt;</em></code> or <code>--font <em>&lt;file&gt;</em></code></dt>
+<dd>Impressive uses some kind of text OSD to overlay the current page number and title (if available) on the overview page. This option can be used to specify a TrueType font file (.ttf) to use for the OSD. If the path specified doesn't directly point to a useable font file, Impressive will try to search the system font directories. <!--man:off-->On Unix-like systems, it<!--man:on--><!--man It--> assumes that all fonts are stored below <code>/usr/share/fonts</code>, <code>/usr/local/share/fonts</code> or <code>/usr/X11R6/lib/X11/fonts/TTF</code> for this purpose (the latter one is useful for Mac OS X systems specifically). If this option is not specified, <!--man:off--><code>Verdana.ttf</code> will be used as a default if the operating system is Windows, or<!--man:on--> any of <code>DejaVuSans.ttf</code> or <code>Vera.ttf</code> (the typical file name of Bitstream Vera Sans) <!--man:off-->if it's not<!--man:on--><!--man will be used as a default.-->.</dd>
+
+<dt><code>-g <em>&lt;width&gt;</em>x<em>&lt;height&gt;</em></code> or <code>--geometry <em>&lt;width&gt;</em>x<em>&lt;height&gt;</em></code></dt>
+<dd>Sets the screen size or resolution Impressive shall use (in pixels).<!--man:off--> On Win32 platforms and Unix platforms with <code>xrandr</code><!--man:on--><!--man If \fBxrandr\fR is-->installed, the default screen size for fullscreen mode is the current screen resolution; on other platforms, Impressive uses the highest resolution available to the graphics system. If a standard resolution cannot be determined, the default is 1024x768 pixels. Note that this option is <em>not</em> the standard X &ldquo;geometry&rdquo; option and does therefore not support window positioning (e.g. <code>-g 800x600+0-0</code> will <em>not</em> work!).</dd>
+
+<dt><code>-G <em>&lt;gamma&gt;</em>[:<em>&lt;blacklevel&gt;</em>]</code> or <code>--gamma <em>&lt;gamma&gt;</em>[:<em>&lt;blacklevel&gt;</em>]</code></dt>
+<dd>Sets up the startup gamma and (optional) black level value. The black level is the original image's intensity level (0...254) that is to be mapped to black in Impressive's output. Note that gamma and black level adjustments may be unavailable or constrained on some systems.</dd>
+
+<dt><code>-h</code> or <code>--help</code></dt>
+<dd>If this option is specified, Impressive writes a short command line help screen to standard output and does not start a presentation.</dd>
+
+<dt><code>-i <em>&lt;page&gt;</em></code> or <code>--initialpage <em>&lt;page&gt;</em></code></dt>
+<dd>Specifies the page number to start with. The default value is 1 (start with the first page). If another value is specified, the page shown by Impressive right after initialization is not the first one of the PDF or image list. Additionally, pre-rendering (if enabled) will also start at the specified page.</dd>
+
+<dt><code>-I <em>&lt;filename&gt;</em></code> or <code>--script <em>&lt;filename&gt;</em></code></dt>
+<dd>Overrides automatic derivation of the info script filename and specifies a script file directly.</dd>
+
+<dt><code>-l</code> or <code>--listtrans</code></dt>
+<dd>If this option is specified, Impressive writes a list of all available transition classes to standard output and does not start a presentation. Transitions that are enabled by default are marked with a star (<code>*</code>) left of the class name.</dd>
+
+<dt><code>-L <em>&lt;spec&gt;</em></code> or <code>--layout <em>&lt;spec&gt;</em></code></dt>
+<dd>Specified the OSD layout. Read below for an explanation of this option</dd>
+
+<dt><code>-M</code> or <code>--minutes</code></dt>
+<dd>If this option is set, Impressive will show the on-screen timer (activated with the [T] key) only with 1 minute resolution. By default, it will show a timer with 1 second resolution.</dd>
+
+<dt><code>-o <em>&lt;directory&gt;</em></code> or <code>--output <em>&lt;directory&gt;</em></code></dt>
+<dd>Do not display the presentation, but render it into a series of PNG image files inside the specified directory. The images will be generated in the current resolution as specified by the <code>-g</code> option. This option is useful if you're going to give a presentation on a foreigh PC with an old, broken or otherwise problematic Xpdf or GhostScript installation: By generating images of the PDF pages you can ensure that no rendering bugs will happen on the target system.</dd>
+
+<dt><code>-O <em>&lt;mode&gt;</em></code> or <code>--autooverview <em>&lt;mode&gt;</em></code></dt>
+<dd>Enables or disables automatic derivation of whether a page shall or shall not be shown on the overview page. This feature is based on the fact that some LaTeX presentation packages tag all pages with a title (that can be read by Impressive with the help of <code>pdftk</code>), except those that contain multiple reveal steps.<br />
+The following modes are available:<dl>
+<dt><code>off</code></dt><dd>Disables automatic overview mode. All pages will be shown on the overview page by default. This is also the default setting.</dd>
+<dt><code>first</code></dt><dd>All pages with a PDF title will be shown on the overview page. The purpose is to show the <strong>initial</strong> state of multi-step slides on the overview page.</dd>
+<dt><code>last</code></dt><dd>All pages <strong>before</strong> a page with a PDF title will be shown on the overview page. The purpose is to show the <strong>final</strong> state of multi-step slides on the overview page.</dd>
+</dl>Again, the mode may be abbreviated arbitrarily, down to one character, just like with the <code>-c</code> option above..</dd>
+
+<dt><code>-p <em>&lt;start&gt;</em>-<em>&lt;end&gt;</em></code> or <code>--pages <em>&lt;start&gt;</em>-<em>&lt;end&gt;</em></code></dt>
+<dd>Using this option, the range of the page displayed can be narrowed down. The presentation will start at the first page in the range. All pages outside of the range will not be shown on the overview page and will not be cached. However, they can be entered manually when cycling through the presentation. Due to the fact that these pages are uncached, preparation of the display will take considerably longer.</dd>
+
+<dt><code>-P <em>&lt;path&gt;</em></code> or <code>--gspath <em>&lt;path&gt;</em></code></dt>
+<dd>This option can be used to override the Xpdf / GhostScript path autodetection. The full path to the executable of either GhostScript (<code>gs</code> or <code>gs.exe</code>) or Xpdf's <code>pdftoppm</code> utility must be specified.</dd>
+
+<dt><code>-r <em>&lt;n&gt;</em></code> or <code>--rotate <em>&lt;n&gt;</em></code></dt>
+<dd>Display all pages rotated by <em>n</em>&times;90 degrees clockwise. Try <code>-r 1</code> or <code>-r 3</code> if you run into problems with PDFs generated by LaTeX on some Xpdf or GhostScript versions.</dd>
+
+<dt><code>-R <em>&lt;X&gt;</em>x<em>&lt;Y&gt;</em></code> or <code>--meshres <em>&lt;X&gt;</em>x<em>&lt;Y&gt;</em></code></dt>
+<dd>Most effects subdivide the visible screen into a mesh of rectangular or quadratic pieces, each with its own coordinates and alpha blend values. Using this parameter, the resolution of the subdivision mesh can be defined. The default value is 48x36. On slow machines, lower values like 24x18 or 12x9 can heavily speed up transition rendering at the cost of visual quality. On the other hand, higher values like 64x48 or 96x72 improve quality, but use much more CPU cycles.</dd>
+
+<dt><code>-s</code> or <code>--scale</code> <em>(image input only)</em></dt>
+<dd>If a directory with image files is used as input, Impressive will scale down images that are too big for the screen. But by default, it will not scale up smaller images to fit the screen; it will leave a black border instead. This option overrides this setting and enables upscaling of smaller images.</dd>
+
+<dt><code>-s</code> or <code>--supersample</code> <em>(PDF input only)</em></dt>
+<dd>This switch enables antialiasing by 4x supersampling instead of the normal multisampling method used by Xpdf or GhostScript. While this usually degrades both visual quality and performance, it may be necessary for circumventing white strips or moir&eacute;-like patterns in gradients.</dd>
+
+<dt><code>-S <em>&lt;pixels&gt;</em></code> or <code>--fontsize <em>&lt;pixels&gt;</em></code></dt>
+<dd>This option sets the size, in pixels, of the OSD font. The default value is 14.</dd>
+
+<dt><code>-t <em>&lt;ms&gt;</em></code> or <code>--transition <em>&lt;trans1[,trans2...]&gt;</em></code></dt>
+<dd>Using this switch, the set of transitions Impressive will randomly draw at page changes can be specified. If only one transition class is specified, this class will be used for all pages that do not have another transition explicitly assigned in their page properties. Multiple transitions have to be separated by commas; they will be used in random order. The <code>-l</code> option can be used to get a list of available transitions.</dd>
+
+<dt><code>-T <em>&lt;ms&gt;</em></code> or <code>--transtime <em>&lt;ms&gt;</em></code></dt>
+<dd>Sets the duration (in milliseconds) of page transitions. 0 (zero) disables transitions altogether. Default value: 1000 ms.</dd>
+
+<dt><code>-u <em>&lt;seconds&gt;</em></code> or <code>--poll <em>&lt;seconds&gt;</em></code></dt>
+<dd>If this option is specified, the source file or directory will be checked for changed regularly. If a change in the input PDF file or any of the image files in the input image directory is detected, the page cache will be flushed and the current page as well as the info script will be reloaded. The current page's transition will be shown between the old and the new version of the page.<br />
+The new PDF file must have at least as much pages as the old one; also, it should have the same aspect ratio. If the input is a directory, image files must not have disappeared.</dd>
+
+<dt><code>-w</code> or <code>--wrap</code></dt>
+<dd>If this option is set, Impressive will &ldquo;wrap&rdquo; over to the first page after the last page. In other words, advancing to the next page at the end of the presentation will restart the whole presentation.</dd>
+
+<dt><code>-Z <em>&lt;ms&gt;</em></code> or <code>--zoom <em>&lt;ms&gt;</em></code></dt>
+<dd>Sets the duration (in milliseconds) of the overview page zoom-in/zoom-out effects. Default value: 250 ms.</dd>
+
+<dt><code>--cachefile <em>&lt;filename&gt;</em></code></dt>
+<dd>Activates persistent cache mode and specifies the name of the cache file to use.</dd>
+
+</dl>
+
+<!--man:on:head="Arguments"-->
+<p>Following the options, the input file name(s) must be specified. Recognized file types are PDF, JPEG, PNG, TIFF, BMP and PGM/PPM. If the name of a directory is put on the command line, all recognized image files (no PDF files!) in this directory will be played in alphanumeric order (case-insensitive).</p>
+
+<p>In addition, Impressive can use a text file containing a list of files or directories to show: This text file must contain at most one file name per line; every character after a hash sign (<code>#</code>) is treated as a comment and will be ignored. If such a comment is put on the same line as an image file name, it will be used as the page's title. List file names must be prefixed with an at sign (<code>@</code>) on the command line, e.g. <code>impressive @my_list_file</code>.</p>
+
+<p>Impressive will also expand wild-card characters (<code>*</code> and <code>?</code>) if this isn't already done by the shell, but apart from that, it will not reorder the arguments. Thus, it will show the documents in the order specified at the command line.</p>
+<!--man:off-->
+
+<h3>Layout options</h3>
+
+<!--man:nolistspace:on:head="Layout~options"-->
+<p>The OSD layout option (<code>-L</code>/<code>--layout</code>) accepts a string with comma-separated <code><em>key</em>=<em>value</em></code> pairs. The following keywords are recognized:<!--man:off--></p><!--man:on-->
+<!--man .br--><dl>
+<dt><code>alpha</code></dt><dd>The opacity of the OSD text, either as a floating-point value between 0 and 1 or a percentage between 2 and 100.</dd>
+<dt><code>margin</code></dt><dd>The distance (in pixels) of the OSD text to the screen borders.</dd>
+<dt><code>time</code></dt><dd>The position of the timer.</dd>
+<dt><code>title</code></dt><dd>The position of the page title in overview mode.</dd>
+<dt><code>page</code></dt><dd>The position of the page number in overview mode.</dd>
+<dt><code>status</code></dt><dd>The position of the status line.</dd>
+</dl>
+<p>The position specifications are composed by one character that indicates whether the text shall be displayed at the top (<code>T</code>) or bottom (<code>B</code>) edge of the screen and one character that indicates whether it shall appear on the left (<code>L</code>), on the right (<code>R</code>) or centered (<code>C</code>).</p>
+<p>For example, the default OSD layout equals the following option string:<br />
+<code style="white-space:pre;">    -L margin=16,alpha=1,time=TR,title=BL,page=BR,status=TL</code></p>
+<!--man:listspace:off-->
+
+<!-------------------------------------------------------------------------------->
+
+<!--man:on-->
+<h2><a name="usage"></a>Usage</h2>
+
+<p>On startup, Impressive will display a black screen with the program logo at the center. If caching is enabled, but background rendering is disabled, all pages of the presentation will then be rendered once. A bar in the lower half of the screen displays the progress of this operation. Any key (except for Q and Esc) or mouse click skips this process, with the effect that Impressive will render the remaining pages on demand. Please note that the overview page will not be complete until every page has been rendered at least once. In other words, if the precaching process was skipped, placeholders will be displayed for all pages that have not been rendered yet. By default, Impressive will build up the cache in the background while the presentation runs. Thus, the progress bar will not appear and the preparation will only take the amount of time required to render the first two pages of the presentation.</p>
+
+<p>After this initialization process, Impressive will switch to the first page directly and without any transition.<!--man:off-->
+The following keyboard and mouse operations are available from this moment on:</p>
+
+<dl>
+
+<!--man:on:head="Controls"-->
+<dt><strong>Q</strong> key or <strong>Esc</strong> key</dt>
+<dd>Quit Impressive immediately.</dd>
+
+<dt><strong>LMB</strong> (left mouse button), <strong>Page Down</strong> key, <strong>Cursor Down</strong> key, <strong>Cursor Right</strong> key or <strong>Spacebar</strong></dt>
+<dd>Go to the next page (using a transition).</dd>
+
+<dt><strong>RMB</strong> (right mouse button), <strong>Page Up</strong> key, <strong>Cursor Up</strong> key, <strong>Cursor Left</strong> key or <strong>Backspace</strong> key</dt>
+<dd>Go to the previous page (using a transition).</dd>
+
+<dt><strong>Home</strong> key / <strong>End</strong> key</dt>
+<dd>Go directly to the first or last page of the presentation.</dd>
+
+<dt><strong>L</strong> key</dt>
+<dd>Return to the last (most recently displayed) page. This can be used to toggle back and forth between two pages.</dd>
+
+<dt><strong>F</strong> key</dt>
+<dd>Toggle fullscreen mode. <!--man:off-->Unfortunately, this does not work on Windows systems.<!--man:on--></dd>
+
+<dt><strong>Tab</strong> key or <strong>MMB</strong> (middle mouse button)</dt>
+<dd>Zoom back to the overview page. While in overview mode, a page can be selected with the mouse and activated with the left mouse button. The right or middle mouse button or the Tab key leave overview mode <em>without</em> changing the current page.</dd>
+
+<dt><strong>LMB</strong> over a PDF hyperlink</dt>
+<dd>Jump to the page referenced by the hyperlink. Two types of hyperlinks are supported: Links that point to some other page of the same document, and URL hyperlinks like Web links and e-mail addresses. This feature is only available if <code>pdftk</code> is installed. Furthermore, <code>xdg-open</code> from the freedesktop.org Portland project is required for URL links <!--man to work.--><!--man:off-->on non-Win32 platforms.<!--man:on--> Please note that the hyperlink feature will not work properly when pages are rotated.</dd>
+
+<dt>click&amp;drag with <strong>LMB</strong> (left mouse button)</dt>
+<dd>Create a new highlight box. While at least one highlight box is defined on the current page, the page itself will be shown in a darker and blurry rendition. Only the highlight boxes will be displayed in their original lightness and sharpness.<br />
+If a page with highlight boxes is left, the boxes will be saved and restored the next time this page is shown again.</dd>
+
+<dt><strong>RMB</strong> (right mouse button) over a highlight box</dt>
+<dd>If the right mouse button is clicked while the mouse cursor is above a highlight box, the box will be removed. If the last box on a page is removed, the page will turn bright and sharp again.</dd>
+
+<dt><strong>S</strong> key</dt>
+<dd>Save the info script associated with the current presentation. The main purpose for this is to permanently save highlight boxes or keyboard shortcuts, so they will be restored the next time this presentation is started.</dd>
+
+<dt><strong>T</strong> key</dt>
+<dd>Activate or deactivate the time display at the upper-right corner of the screen. If the timer is activated while the very first page of the presentation is shown, it activates &raquo;time tracking&raquo; mode. In this mode, a report of all pages visited with their display duration, enter and leave times will be written to standard output. This can be very useful when preparing presentations.</dd>
+
+<dt><strong>R</strong> key</dt>
+<dd>Reset the presentation timer.</dd>
+
+<dt><strong>Return</strong> key or <strong>Enter</strong> key</dt>
+<dd>Toggle spotlight mode. In this mode, the page is darkened in the same way as if highlight boxes are present, but instead of (or in addition to) the boxes, a circular &ldquo;spotlight&rdquo; will be shown around the mouse cursor position, following every motion of the mouse cursor.</dd>
+
+<dt><strong>+</strong> key / <strong>&ndash;</strong> key or mouse wheel</dt>
+<dd>Adjust the spotlight radius.</dd>
+
+<dt><strong>Z</strong> key</dt>
+<dd>Toggle zoom mode. When this key is first pressed, the current page will zoom in. The page will be displayed at double size, but in its original resolution (i.e. it will be blurry). Impressive will re-render the page at the new resolution if the graphics hardware supports it. During this time, Impressive will <strong>not</strong> accept any input, so don't even think about clicking the mouse or pressing keys before the image gets crisp again.<br />
+In zoom mode, all other functions will work as normal. Any operations that leave the current page, such as flipping the page or entering the overview screen, will leave zoom mode, too.</dd>
+
+<dt><strong>[</strong> / <strong>]</strong> key</dt>
+<dd>Adjust the gamma value of the display (might not be supported on every hardware).</dd>
+
+<dt><strong>{</strong> / <strong>}</strong> key</dt>
+<dd>Adjust the black level of the display (might not be supported on every hardware).</dd>
+
+<dt><strong>\</strong> key</dt>
+<dd>Revert gamma and black level back to normal.</dd>
+
+<dt><strong>O</strong> key</dt>
+<dd>This will toggle the &raquo;visible on overview page&laquo; flag of the current page. The result will not be visible immediately, but it can be saved to the info script (using the <strong>S</strong> key) and will be in effect the next time the presentation is started.</dd>
+
+<dt><strong>I</strong> key</dt>
+<dd>This will toggle the skip flag of the current page. A page marked as skipped will not be reachable with the normal forward/backward navigation keys.</dd>
+
+<dt><strong>B</strong> key / <strong>W</strong> key</dt>
+<dd>Fade to black or white, respectively. This feature can be used if a whiteboard or blackboard in front of the projection area is to be used during the presentation. Using these two keys, the screen will fade into a solid color. On any keypress or mouse click, it will fade back to normal. These keys are not available in overview mode.</dd>
+
+<dt>click&amp;drag with <strong>RMB</strong> (right mouse button) in zoom mode</dt>
+<dd>Move the visible part of the page in zoom mode.</dd>
+
+<dt><strong>Cursor</strong> keys in overview mode</dt>
+<dd>Navigate through pages.</dd>
+
+<dt><strong>Alt</strong>+<strong>Tab</strong> keys</dt>
+<dd>Leaves fullscreen mode<!--man:off--> on Unix-like systems <!--man:on-->to facilitate task switching while running full-screen presentations.</dd>
+
+</dl>
+
+<!--man .PP-->
+<p>Any other alphanumeric (A-z, 0-9) or function key (F1-F12) can be used to assign shortcuts to pages that require quick access. If one of the keys is pressed together with <strong>Shift</strong>, the currently displayed page is associated with this key. To recall the page later, it is sufficient to press the shortcut key again. Shortcuts can be permanently stored with the <strong>S</strong> key.</p>
+<!--man:off-->
+
+<!-------------------------------------------------------------------------------->
+
+<!--man:on-->
+<h2><a name="scripts"></a>Info Scripts</h2>
+
+<p>Impressive offers a powerful way to customize individual presentations using so-called info scripts. An info script is a text file having the same name and located in the same directory as the presentation file itself, except for the additional suffix <code>.info</code>. Thus, a presentation file called <code>BrandNewProduct.pdf</code> would have a info script with the name <code>BrandNewProduct.pdf.info</code>. If multiple arguments were specified on the command line, the info script will be called just <code>.info</code> (a dot file, so to speak). If a directory name was specified as the only argument, either a file called <code><em>DirectoryName</em>.info</code> or a file called <code>.info</code> <em>inside</em> the directory will be used, depending on whether a path separator was specified at the end of the directory name or not &ndash; Impressive simply appends <code>.info</code> to whatever the input path name was.<br />
+In any case, the default file name can be overridden by the <code>-I</code> command line option.</p>
+
+<p>Info scripts are actually Python scripts with full access to Impressive's global data structures and functions. (It is possible to write real interactive applications using info scripts.) Thus, they can modify a broad range of settings concerning Impressive. This manual will only cover the most basic ones.</p>
+
+<h3>Page Properties</h3>
+
+<p>The main part of an info script defines the properties of each page. At the moment, the following properties are defined:</p>
+<dl>
+
+<dt><code>title</code></dt>
+<dd>Each page can have a title that is displayed in the Impressive window's title bar. If there is no title explicitly specified in the info script, the title of the page will be extracted from PDF metadata if pdftk is installed, or the image file name will be used if the presentation is an image slideshow.</dd>
+
+<dt><code>transition</code></dt>
+<dd>With this property, the transition class to be used for rendering the transition between this page and the following page can be specified. For pages lacking this property, random transitions will be chosen. A list of available transition classes can be obtained with <code>impressive -l</code>.</dd>
+
+<dt><code>transtime</code></dt>
+<dd>This property overrides the global transition time parameter (<code>-T</code> at the command line). It contains the integer time (in milliseconds) the transition between this page and the following page shall be shown.</dd>
+
+<dt><code>overview</code></dt>
+<dd>This property holds a boolean value (0/<code>False</code> or 1/<code>True</code>) that specifies whether the page shall be included in the overview page. If this property isn't specified, it is assumed to be <code>True</code>.</dd>
+
+<dt><code>skip</code></dt>
+<dd>This boolean property can be set to 1/<code>True</code> if the page shall be skipped during the presentation.<br />Pages with <code>overview:True, skip:False</code> will be accessible both by cycling through the pages and using the overview page,<br />pages with <code>overview:True, skip:True</code> will be silently skipped in the normal page cycle, but remain accessible from the overview page,<br />pages with <code>overview:False, skip:False</code> will appear in the normal cycle, but not on the overview page<br />and pages with <code>overview:False, skip:True</code> will not be accessible at all.</dd>
+
+<dt><code>boxes</code></dt>
+<dd>This property stores a list of highlight box coordinates. Normally, there is no need to edit this by hand, as Impressive handles this automatically if the <strong>S</strong> key is pressed.</dd>
+
+<dt><code>timeout</code></dt>
+<dd>If a <code>timeout</code> property is present and the page is shown for the first time, Impressive will automatically switch to the next page after the specified number of milliseconds.</dd>
+
+<dt><code>comment</code></dt>
+<dd>This property can hold a string with a single line of text that will be displayed on screen while the page is shown. Display of this text can not be disabled.</dd>
+
+<dt><code>sound</code></dt>
+<dd>Specifies the file name of a sound file to be played (via MPlayer) when the page is first entered. Once started, the sound will be played until its end is reached, another sound or video is played, or Impressive is exited.</dd>
+
+<dt><code>video</code></dt>
+<dd>Specifies the file name of a video file to be played when the page is entered. The video will be displayed full-screen. Any key or mouse click stops playback. Note that this function is highly experimental and might not work reliably on every system!</dd>
+
+<dt><code>progress</code></dt>
+<dd>If this property is set to zero, the presentation progress bar (which is usually set up with the <code>-d</code>/<code>--duration</code> command line switch) will not be shown on this page. In practice, it might be useful to hide the bar from the first page so that it is not visible during the introduction.</dd>
+
+<dt><code>reset</code></dt>
+<dd>If this property is set to 1 or <code>True</code>, the timer will be reset each time this page is left, just as if the <strong>R</strong> has been pressed. If the special value 2 or <code>FirstTimeOnly</code> is used, the reset will only take place if the page was shown for the first time. Again, this is particularly useful on the first page: A combination of <code>progress:False, reset:FirstTimeOnly</code> makes it possible to set up the presentation long before it actually begins &ndash; the first page can be showed as long as desired, actual timing starts at the second page.</dd>
+
+<dt><code>rotate</code></dt>
+<dd>This property is a per-page override of the global <code>-r</code> command line option: It specifies how the page shall be rotated, in 90-degree steps clockwise.</dd>
+
+<dt><code>OnEnter</code>, <code>OnLeave</code>, <code>OnEnterOnce</code>, <code>OnLeaveOnce</code></dt>
+<dd>These properties can contain a Python callable (i.e. a function reference or lambda expression) that is executed when the page is entered or left. The <code>~Once</code> variants will only be executed when the page is entered or left for the first time. The callable must not take any arguments. This feature can be used to associate arbitrary Python code with specific pages, for example to execute external programs.<br />
+<strong>Warning:</strong> Lambda expressions cannot be properly processed by the Info Script save function (<strong>S</strong> key). If Impressive encounters lambda expressions when saving, it will remove them. In addition, it will not overwrite the original info script, but generate an extra file that needs to be merged withe the original script by hand.</dd>
+
+<dt><code>keys</code></dt>
+<dd>This property can be assigned a dictionary that maps alphanumerical keys to Python functions. For example, <code>'keys': { 'x': SomeFunction }</code> will invoke <code>SomeFunction()</code> if the lowercase character 'x' is typed while the page is displayed. Regarding the functions, the same restrictions as for the <code>OnEnter</code>/<code>OnLeave</code> family apply: the function must not take any parameters and lambda functions can not be saved. Also note that it is not possible to overwrite Impressive's pre-defined key bindings with this method.</dd>
+
+</dl>
+
+<p>The properties are stored together in a Python dictionary called <code>PageProps</code>. The syntax looks like in this example:</p>
+
+<pre>PageProps = {
+  1: {
+       'title': "Title Page",
+       'transition': PagePeel,
+       'sound': "background_music.mp3"
+     },
+  2: {
+       'title': "Another Page",
+       'timeout': 5000
+     }
+}</pre><!--man .PP-->
+
+<p>The PageProps definition (and <strong>only</strong> the PageProps definition) will be rewritten by Impressive if the <strong>S</strong> key is pressed. User-defined PageProps entries will also be left untouched, except for some pretty-printing.</p>
+
+<h3>Global Presentation Properties</h3>
+
+<p>The name of the presentation is shown in the title bar of the Impressive window (if not in fullscreen mode). By default, the file name or (if available) PDF metadata title will be used for this purpose, but the presentation title can also be explicitly set by overwriting the <code>DocumentTitle</code> variable:<br />
+<code>&nbsp;&nbsp;&nbsp;&nbsp;DocumentTitle = &quot;My Presentation&quot;</code></p>
+
+<p>Another useful variable, <code>AvailableTransitions</code>, contains a list of all transition classes that may be used for randomly assigning transitions to pages lacking the <code>transition</code> property. Thus, if you want to exclude a certain transition (either because you don't like it or because you want to have it exclusively on pages where you manually assigned it using <code>PageProps</code>), you can write something like<br />
+<code>&nbsp;&nbsp;&nbsp;&nbsp;AvailableTransitions.remove(WipeBlobs)</code><br />
+On the other side, it's possible to activate transitions that are not enabled by default:<br />
+<code>&nbsp;&nbsp;&nbsp;&nbsp;AvailableTransitions += [SlideUp, SlideDown]</code><br />
+Alternatively, you can completely overwrite <code>AvailableTransitions</code> to have the same transition (or set of transitions) assigned to all pages:<br />
+<code>&nbsp;&nbsp;&nbsp;&nbsp;AvailableTransitions = [Crossfade]</code></p>
+
+<h3>Option Overrides</h3>
+
+<p>Another use of info scripts is overriding the default or command-line settings on a per-file basis. This can be done by simply overwriting one of the variables that are defined at the beginning of <code>impressive.py</code>. Each of these variables corresponds either to a command-line setting, or to some constant related to visual appearance or performance. So, for example, to force fullscreen mode for a presentation, write<br />
+<code>&nbsp;&nbsp;&nbsp;&nbsp;Fullscreen = True</code></p>
+<!--man:off-->
+
+<!-------------------------------------------------------------------------------->
+
+<h2><a name="misc"></a>Other Useful Information</h2>
+
+<h3>Useful Third-Party Tools</h3>
+
+<p><em>Sebastian Wiesner</em> has written a nice GUI Launcher for Impressive using PyKDE: <a href="http://impressivegui.berlios.de/">ImpressiveGUI</a>.</p>
+
+<p><em>Rob Reid</em> has written a Perl script that extracts transition information from special comments in LaTeX beamer source files and generates a Impressive info script from the gathered information: <a href="http://www.cv.nrao.edu/~rreid/software/#gettransitions">gettransitions</a>.</p>
+
+<h3>License</h3>
+
+<p>Impressive is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.</p>
+
+<p>This program is distributed in the hope that it will be useful,
+but <em>without any warranty;</em> without even the implied warranty of
+<em>merchantability</em> or <em>fitness for any particular purpose</em>.
+See the GNU General Public License for more details.</p>
+
+<h3>Contact</h3>
+
+<p>You can always <a href="mailto:martin.fiedler@gmx.net?subject=Impressive">contact the author</a> of Impressive to send him ...</p>
+<ul>
+<li>bug reports</li>
+<li>feature suggestions</li>
+<li>fan mail</li>
+<li>corrections regarding the web page (I'm not a native speaker &ndash; any grammatical, ortographical or stylistic corrections or suggestions are welcome!)</li>
+<li>new silly quotations for the web page's title bar :)</li>
+</ul>
+
+<!--man
+.SH "AUTHOR"
+.IX Header "AUTHOR"
+Impressive and its documentation has been written mainly by Martin J. Fiedler <martin.fiedler@gmx.net>, with small portions of the code written by external contributors. See the source code file for details.
+.SH "REPORTING BUGS"
+.IX Header "REPORTING BUGS"
+Report bugs to to <martin.fiedler@gmx.net>.
+-->
+</body></html>

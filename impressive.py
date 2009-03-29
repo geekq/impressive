@@ -143,9 +143,9 @@ else:
         res_re = re.compile(r'\s*(\d+)x(\d+)\s+\d+\.\d+\*')
         # parse string like
         # LVDS connected 1280x800+1920+0 (normal left inverted right x axis y axis) 287mm x 180mm
-        todo_res_re = re.compile(r'([^\s]+)    # monitor name, e.g. LVDS or VGA
+        todo_res_re = re.compile(r"""([^\s]+)    # monitor name, e.g. LVDS or VGA
                               \s+connected\s+
-                              ([^s]+)          # geometry expression', re.VERBOSE)
+                              ([^s]+)          # geometry expression""", re.VERBOSE)
         # use different regex, do not match for strings ending with asterisk,
         # search for strings with 'connected' and parse the complete
         # geometry expression 1280x800+1920+0 for **every** monitor,
@@ -504,6 +504,12 @@ def Quit(code=0):
 
 
 ##### RENDERING TOOL CODE ######################################################
+class FrameCoordinates:
+    # offset_x, offset_y, width, height
+    def str():
+        pass
+    def parse(geometry): # geometry - as used by X11
+        pass
 
 # draw a fullscreen quad
 def DrawFullQuad():

@@ -1,8 +1,11 @@
 Motivation for the _impress!ve_ fork
 ====================================
 
+[impressive][] is the best software available on linux for showing
+PDF based presentations.
+
 Macs have the perfect presentation software: while an external beamer
-shows the slide you are talking about, your notebooks shows
+shows the slide you are talking about, your notebook shows
 
 * the current slide
 * the next slide
@@ -17,10 +20,10 @@ a perfect foundation:
 
 * the code looks clean
 * it is a bit C style, not object oriented - a lot of global, 
-  not (deeper) structured variables
+  not (deeper) structured variables, but it is OK
 
 More about presentations for geeks can be found in my blog
-<http://blog.geekq.net/2009-03-29-impressive-presentation-for-geeks>
+<http://blog.geekq.net/2009/03/29/impressive-presentation-for-geeks/>
 
 [keyJ]: http://keyj.s2000.ws/
 [impressive]: http://impressive.sourceforge.net/

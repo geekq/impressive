@@ -1,26 +1,5 @@
-Presentations for geeks
-=======================
-Recently I've discovered a great presentation tool chain
-for real geeks:
-
-* beamer latex class to describe the slides in latex
-* vim for editing
-* [impressive][] (former keyJnote) by [keyJ][] for displaying
-
-There two points for improvement in this chain.
-
-
-Markdown plus latex
--------------------
-
-A pure latex file demands too much markup for my taste, the same way
-an html file needs too much markup. I am going to use something like
-markdown with latex fragments the same way you can use html in markdown
-as fallback in case you need something special
-
-
-Motivation for the _impressive_ fork
-------------------------------------
+Motivation for the _impress!ve_ fork
+====================================
 
 Macs have the perfect presentation software: while an external beamer
 shows the slide you are talking about, your notebooks shows
@@ -33,14 +12,15 @@ shows the slide you are talking about, your notebooks shows
 This is **exactly** what I need and what _impressive_ is unfortunately
 missing - the dual monitor feature.
 
-_impressive_ source code seems to be a perfect foundation:
+_impressive_ is written in python and the source code seems to be 
+a perfect foundation:
+
 * the code looks clean
 * it is a bit C style, not object oriented - a lot of global, 
   not (deeper) structured variables
 
-
-http://github.com/geekq/impressive
-http://blog.geekq.net
+More about presentations for geeks can be found in my blog
+<http://blog.geekq.net/2009-03-29-impressive-presentation-for-geeks>
 
 [keyJ]: http://keyj.s2000.ws/
 [impressive]: http://impressive.sourceforge.net/

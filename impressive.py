@@ -141,6 +141,15 @@ else:
             print >>sys.stderr, "Error: cannot open URL `%s'" % url
     def GetScreenSize():
         res_re = re.compile(r'\s*(\d+)x(\d+)\s+\d+\.\d+\*')
+        # parse string like
+        # LVDS connected 1280x800+1920+0 (normal left inverted right x axis y axis) 287mm x 180mm
+        todo_res_re = re.compile(r'([^\s]+)    # monitor name, e.g. LVDS or VGA
+                              \s+connected\s+
+                              ([^s]+)          # geometry expression', re.VERBOSE)
+        # use different regex, do not match for strings ending with asterisk,
+        # search for strings with 'connected' and parse the complete
+        # geometry expression 1280x800+1920+0 for **every** monitor,
+        # use LVDS as prompter monitor and prefer VGA as projection monitor
         for path in os.getenv("PATH").split(':'):
             fullpath = os.path.join(path, "xrandr")
             if os.path.exists(fullpath):
@@ -149,7 +158,11 @@ else:
                     for line in os.popen(fullpath, "r"):
                         m = res_re.match(line)
                         if m:
+                            # m.group(1) - monitor name
+                            # m.group(2) - X geometry expression
+                            print "xrandr found matching line " + line
                             res = tuple(map(int, m.groups()))
+                            print "xrandr found match " + str(res)
                 except OSError:
                     pass
                 if res:

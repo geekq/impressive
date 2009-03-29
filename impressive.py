@@ -882,10 +882,11 @@ AllTransitions.append(SpiralOutIn)
 # can be randomly assigned to pages
 AvailableTransitions=[ # from coolest to lamest
     # PagePeel, # deactivated: too intrusive
-    WipeBlobs,
-    WipeCenterOut,WipeCenterIn,
-    WipeDownRight,WipeUpLeft,WipeDown,WipeUp,WipeRight,WipeLeft,
-    Crossfade
+#    WipeBlobs,
+#    WipeCenterOut,WipeCenterIn,
+#    WipeDownRight,WipeUpLeft,WipeDown,WipeUp,WipeRight,WipeLeft,
+#    Crossfade
+    None
 ]
 
 

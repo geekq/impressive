@@ -523,6 +523,12 @@ class FrameCoordinates:
     def __repr__(self):
         return "size %d,%d offset %d,%d" % self.offset_x, self.offset_y, self.width, self.height
 
+    def as_tuple(self):
+	return (self.width, self.height, self.offset_x, self.offset_y)
+
+    def glViewport(self):
+	flViewport(self.offset_x, self.offset_y, self.width, self.height)
+
 # draw a fullscreen quad
 def DrawFullQuad():
     glBegin(GL_QUADS)

@@ -1,0 +1,5 @@
+*.swp
+*.pyc
+probe.py
+maze.py
+

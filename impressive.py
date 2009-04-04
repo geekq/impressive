@@ -505,19 +505,33 @@ def Quit(code=0):
 
 ##### RENDERING TOOL CODE ######################################################
 class FrameCoordinates:
+    GEOMETRY_REGEX = re.compile(r"(\d+)x(\d+)\+(\d+)\+(\d+)")
     # offset_x, offset_y, width, height
-    def str():
-        pass
-    def parse(geometry): # geometry - as used by X11
-        pass
+
+    def __init__(self, geometry): 
+	"""Creates new FrameCoordinates object by parsing a X11 like geometry string.
+	Example: 1024x768+1280+0"""
+	parsed = FrameCoordinates.GEOMETRY_REGEX.match(geometry)
+	if not parsed:
+	    raise ValueError, "Geometry string '%s' could not be parsed" % geometry
+	(self.width, self.height, self.offset_x, self.offset_y) = \
+	  [int(elem) for elem in parsed.groups()]
+
+    def __repr__(self):
+        return "size %d,%d offset %d,%d" % self.offset_x, self.offset_y, self.width, self.height
 
 # draw a fullscreen quad
 def DrawFullQuad():
     glBegin(GL_QUADS)
-    glTexCoord2d(    0.0,     0.0);  glVertex2i(0, 0)
-    glTexCoord2d(TexMaxS,     0.0);  glVertex2i(1, 0)
-    glTexCoord2d(TexMaxS, TexMaxT);  glVertex2i(1, 1)
-    glTexCoord2d(    0.0, TexMaxT);  glVertex2i(0, 1)
+    glTexCoord2d(    0.0,     0.0);  glVertex2d(0, 0)
+    glTexCoord2d(TexMaxS,     0.0);  glVertex2d(0.5, 0)
+    glTexCoord2d(TexMaxS, TexMaxT);  glVertex2d(0.5, 0.5)
+    glTexCoord2d(    0.0, TexMaxT);  glVertex2d(0, 0.5)
+
+    glTexCoord2d(    0.0,     0.0);  glVertex2d(0.5, 0)
+    glTexCoord2d(TexMaxS,     0.0);  glVertex2d(1, 0)
+    glTexCoord2d(TexMaxS, TexMaxT);  glVertex2d(1, 0.5)
+    glTexCoord2d(    0.0, TexMaxT);  glVertex2d(0.5, 0.5)
     glEnd()
 
 # draw a generic 2D quad

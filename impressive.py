@@ -505,7 +505,10 @@ def Quit(code=0):
 
 ##### RENDERING TOOL CODE ######################################################
 class FrameCoordinates:
-    GEOMETRY_REGEX = re.compile(r"(\d+)x(\d+)\+(\d+)\+(\d+)")
+    GEOMETRY_REGEX = re.compile(
+      r"""(\d+)x(\d+)    # resolution
+          \+(\d+)\+(\d+) # offset""", re.VERBOSE)
+
     # offset_x, offset_y, width, height
 
     def __init__(self, geometry): 

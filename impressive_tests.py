@@ -25,6 +25,15 @@ class Geometry(unittest.TestCase):
     def testStr(self):
 	c = impressive.FrameCoordinates.parse("800x600")
 	self.assertEquals("size 800,600 offset 0,0", str(c))
+
+    def testAspectRatio(self):
+	c = impressive.FrameCoordinates.parse("400x600")
+	c.adjust_to_aspect_ratio((4,3), (1,2), (2,1))
+        self.assertEquals(400, c.width)
+        self.assertEquals(300, c.height)
+        self.assertEquals(0, c.offset_x)
+        self.assertEquals(100, c.offset_y)
+	
      
 if __name__ == "__main__":
       unittest.main()

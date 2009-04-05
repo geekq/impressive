@@ -553,6 +553,29 @@ class FrameCoordinates:
     def offset(self):
 	return (self.offset_x, self.offset_y)
 
+    def divide_padding(self, amount, ratio):
+	sum = ratio[0] + ratio[1]
+	if sum > 0:
+	    return amount * ratio[0] / sum
+	else:
+	    return 0
+
+    def adjust_to_aspect_ratio(self, aspect_ratio, vertical_padding_ratio=(1,1), horizontal_padding_ratio=(1,1)):
+	"""The new box will completely fit into the old one, have desired aspect ratio,
+	and will be padded with white space in required proportion.
+	Ratio parameters are two-element-tuples
+	   (1,1) for padding means 'center!'
+	   (1,2) for horizontal_padding means one third left and two thirds right
+	   vertical ratio is bottom to top (upside down), horizontal is left to right """
+	new_width  = self.height * aspect_ratio[0] / aspect_ratio[1]
+	new_height = self.width  * aspect_ratio[1] / aspect_ratio[0]
+	if new_width <= self.width:
+	    self.offset_x += self.divide_padding(self.width-new_width, horizontal_padding_ratio)
+	    self.width = new_width
+	else:
+	    self.offset_y += self.divide_padding(self.height-new_height, vertical_padding_ratio)
+	    self.height = new_height
+
     def glViewport(self):
 	glViewport(self.offset_x, self.offset_y, self.width, self.height)
 
@@ -2634,13 +2657,6 @@ def TransitionTo(page):
     PageEntered()
     if not PreloadNextPage(GetNextPage(Pcurrent, 1)):
         PreloadNextPage(GetNextPage(Pcurrent, -1))
-    if DualHead: # show next page
-	print "PrompterNextFrame=", PrompterNextFrame
-	PrompterNextFrame.glViewport()
-	glClearColor(255,0,0,0)
-	glClear(GL_COLOR_BUFFER_BIT)
-	DrawCurrentPage()
-	WholeWindow.glViewport()	
     return 1
 
 # zoom mode animation
@@ -4068,11 +4084,15 @@ def ParseOptions(argv):
 		    projection, prompter = arg.split(",")
 		    ProjectionFrame = FrameCoordinates.parse(projection)
 		    PrompterWholeFrame = FrameCoordinates.parse(prompter)
+		    print "PrompterWholeFrame: ", PrompterWholeFrame
+		    prompter_width = PrompterWholeFrame.width*9/10/2
 		    PrompterCurrentFrame = FrameCoordinates(
-		      PrompterWholeFrame.width/2, PrompterWholeFrame.height/2)
+		      prompter_width, PrompterWholeFrame.height)
 		    PrompterNextFrame = FrameCoordinates(
-		      PrompterWholeFrame.width/2, PrompterWholeFrame.height/2,
-		      PrompterWholeFrame.width/2)
+		      prompter_width, PrompterCurrentFrame.height,
+		      PrompterWholeFrame.width-PrompterCurrentFrame.width)
+		    PrompterCurrentFrame.adjust_to_aspect_ratio((4,3), (5,3), (0,1))
+		    PrompterNextFrame.adjust_to_aspect_ratio((4,3), (5,3), (1,0))
                 UseAutoScreenSize = False
             except:
                 opterr("invalid parameter for --dual-head")

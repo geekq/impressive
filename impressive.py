@@ -2175,7 +2175,7 @@ def DrawCurrentPage(dark=1.0, do_flip=True):
     if VideoPlaying: return
     glClear(GL_COLOR_BUFFER_BIT)
 
-    if True: # TODO: DualHead
+    if DualHead:
 	ProjectionFrame.glViewport()
 	DrawCurrentPageWorker(dark, do_flip)
 	PrompterCurrentFrame.glViewport()
@@ -3370,20 +3370,36 @@ def main():
     global BackgroundRendering, FileStats, RTrunning, RTrestart, StartTime
     global CursorImage, CursorVisible, InfoScriptPath
     # for dual head support
-    global ProjectionFrame, PrompterNextFrame, PrompterCurrentFrame, PrompterWholeFrame, WholeWindow 
-    global DualHead
+    global DualHead, ProjectionFrame, PrompterNextFrame, PrompterCurrentFrame, PrompterWholeFrame, WholeWindow 
 
-    # Dual head support
-    # TODO HACK currently hard coded for testing purposes
-    DualHead = True
-    if DualHead:
-        ProjectionFrame = FrameCoordinates.parse("800x600+800+0")
-	PrompterCurrentFrame = FrameCoordinates.parse("400x300+0+0")
-        WholeWindow = FrameCoordinates.parse("1600x800+0+0")
-    else:
-	# ProjectionFrame is the whole screen without dual head
+    # initialize graphics
+    pygame.init()
+    if Fullscreen and UseAutoScreenSize:
+        size = GetScreenSize()
+        if size:
+            ScreenWidth, ScreenHeight = size
+            print >>sys.stderr, "Detected screen size: %dx%d pixels" % (ScreenWidth, ScreenHeight)
+    flags = OPENGL|DOUBLEBUF
+    if Fullscreen:
+        flags |= FULLSCREEN
+    try:
+        pygame.display.set_mode((ScreenWidth, ScreenHeight), flags)
+    except:
+        print >>sys.stderr, "FATAL: cannot create rendering surface in the desired resolution (%dx%d)" % (ScreenWidth, ScreenHeight)
+        sys.exit(1)
+    pygame.display.set_caption(__title__)
+    pygame.key.set_repeat(500, 30)
+    if Fullscreen:
+        pygame.mouse.set_visible(False)
+        CursorVisible = False
+    glOrtho(0.0, 1.0,  1.0, 0.0,  -10.0, 10.0)
+    if (Gamma <> 1.0) or (BlackLevel <> 0):
+        SetGamma(force=True)
+
+    WholeWindow = FrameCoordinates.from_size_tuple((ScreenWidth, ScreenHeight))
+    # defaults for single head - whole screen
+    if not DualHead:
         ProjectionFrame = FrameCoordinates.from_size_tuple(ScreenWidth, ScreenHeight)
-        WholeWindow = FrameCoordinates.from_size_tuple(ScreenWidth, ScreenHeight)
 
     # allocate temporary file
     TempFileName = tempfile.mktemp(prefix="impressive-", suffix="_tmp")
@@ -3462,30 +3478,6 @@ def main():
     if not InfoScriptPath:
         InfoScriptPath = FileName + ".info"
     LoadInfoScript()
-
-    # initialize graphics
-    pygame.init()
-    if Fullscreen and UseAutoScreenSize:
-        size = GetScreenSize()
-        if size:
-            ScreenWidth, ScreenHeight = size
-            print >>sys.stderr, "Detected screen size: %dx%d pixels" % (ScreenWidth, ScreenHeight)
-    flags = OPENGL|DOUBLEBUF
-    if Fullscreen:
-        flags |= FULLSCREEN
-    try:
-        pygame.display.set_mode((ScreenWidth, ScreenHeight), flags)
-    except:
-        print >>sys.stderr, "FATAL: cannot create rendering surface in the desired resolution (%dx%d)" % (ScreenWidth, ScreenHeight)
-        sys.exit(1)
-    pygame.display.set_caption(__title__)
-    pygame.key.set_repeat(500, 30)
-    if Fullscreen:
-        pygame.mouse.set_visible(False)
-        CursorVisible = False
-    glOrtho(0.0, 1.0,  1.0, 0.0,  -10.0, 10.0)
-    if (Gamma <> 1.0) or (BlackLevel <> 0):
-        SetGamma(force=True)
 
     # check if graphics are unaccelerated
     renderer = glGetString(GL_RENDERER)
@@ -3689,9 +3681,11 @@ def main():
 # wrapper around main() that ensures proper uninitialization
 def run_main():
     global CacheFile
-    try:
+# HACK: exception handling commented out for better debugging
+#    try:
+    if True:
         main()
-    finally:
+#    finally:
         StopMPlayer()
         # ensure that background rendering is halted
         Lrender.acquire()
@@ -3735,6 +3729,19 @@ Input options:
 Output options:
   -f,  --fullscreen       """+if_op(Fullscreen,"do NOT ","")+"""start in fullscreen mode
   -g,  --geometry <WxH>   set window size or fullscreen resolution
+       --dual-head <projection-geometry>,<prompter-geometry>
+                          enables dual head operation: 
+			    * external output shows current slide
+			    * on the notebook you can see the current and 
+			      the next slide to better prepare your thoughts 
+			  On a modern linux system dual head is operated by xrandr 
+			  extension which defines a big screen containing both
+			  outputs. Geometry strings are as defined by X11, consisting of 
+			  size and offset, example 800x600+1280+0
+			    <projection-geometry> describes the area, which is seen 
+			                          by your audience
+			    <prompter-geometry>   describes the area, which is seen 
+			                          by you, e.g. your notebook
   -A,  --aspect <X:Y>     adjust for a specific display aspect ratio (e.g. 5:4)
   -G,  --gamma <G[:BL]>   specify startup gamma and black level
 
@@ -3909,6 +3916,7 @@ def ParseOptions(argv):
     global EstimatedDuration, CursorImage, CursorHotspot, MinutesOnly
     global GhostScriptPath, pdftoppmPath, UseGhostScript, InfoScriptPath
     global AutoOverview
+    global DualHead, ProjectionFrame, PrompterNextFrame, PrompterCurrentFrame, PrompterWholeFrame, WholeWindow 
 
     try:  # unused short options: jknqvxyzEHJKNQUVWXY
         opts, args = getopt.getopt(argv, \
@@ -3919,7 +3927,7 @@ def ParseOptions(argv):
             "zoom=", "gspath=", "meshres=", "noext", "aspect", "memcache", \
             "noback", "pages=", "poll=", "font=", "fontsize=", "gamma=",
             "duration=", "cursor=", "minutes", "layout=", "script=", "cache=",
-            "cachefile=", "autooverview="])
+            "cachefile=", "autooverview=", "dual-head="])
     except getopt.GetoptError, message:
         opterr(message)
 
@@ -4040,6 +4048,21 @@ def ParseOptions(argv):
                 UseAutoScreenSize = False
             except:
                 opterr("invalid parameter for --geometry")
+        if opt in ("--dual-head"):
+            try:
+		DualHead = True
+		if arg == None:
+		    pass # TODO: run xrandr -q to automatically recognize
+		else:
+		    projection, prompter = arg.split(",")
+		    ProjectionFrame = FrameCoordinates.parse(projection)
+		    PrompterWholeFrame = FrameCoordinates.parse(prompter)
+		    PrompterCurrentFrame = FrameCoordinates.from_full_tuple(PrompterWholeFrame.as_tuple())
+		    PrompterCurrentFrame.width = PrompterWholeFrame.width/2
+		    PrompterCurrentFrame.height = PrompterWholeFrame.height/2
+                UseAutoScreenSize = False
+            except:
+                opterr("invalid parameter for --dual-head")
         if opt in ("-R", "--meshres"):
             try:
                 MeshResX, MeshResY = map(int, arg.split("x"))

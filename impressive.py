@@ -3015,7 +3015,7 @@ def DoOverview():
     global PageEnterTime, OverviewMode
 
     if DualHead:
-	PrompterWholeFrame.glViewport
+	return # disable until it works in combination with dual head
 
     pygame.time.set_timer(USEREVENT_PAGE_TIMEOUT, 0)
     PageLeft()
@@ -3076,6 +3076,7 @@ def SetFullscreen(fs, do_init=True):
     Fullscreen=fs
 
     # redraw the current page (pygame is too lazy to send an expose event ...)
+    ClearScreen()
     DrawCurrentPage()
 
     # show cursor and set auto-hide timer

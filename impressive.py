@@ -20,7 +20,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-__title__   = "Impressive"
+__title__   = "Impressive (dual head)"
 __version__ = "0.10.2"
 __author__  = "Martin J. Fiedler"
 __email__   = "martin.fiedler@gmx.net"
@@ -111,7 +111,11 @@ if os.name == "nt":
             win32api.ShellExecute(0, "open", url, "", "", 0)
     except ImportError:
         MPlayerPath = ""
-        def GetScreenSize(): return pygame.display.list_modes()[0]
+        def GetScreenSize(): 
+	    if True: # DualHead is not set at this point
+		return ProjectionFrame.size()
+	    else:
+	        return pygame.display.list_modes()[0]
         def RunURL(url): print "Error: cannot run URL `%s'" % url
     MPlayerPlatformOptions = [ "-colorkey", "0x000000" ]
     MPlayerColorKey = True
@@ -140,6 +144,9 @@ else:
         except OSError:
             print >>sys.stderr, "Error: cannot open URL `%s'" % url
     def GetScreenSize():
+	if True: # HACK: DualHead is not set at this point
+	    return ProjectionFrame.size()
+
         res_re = re.compile(r'\s*(\d+)x(\d+)\s+\d+\.\d+\*')
         # parse string like
         # LVDS connected 1280x800+1920+0 (normal left inverted right x axis y axis) 287mm x 180mm
@@ -2191,6 +2198,7 @@ def DrawOverlays():
 
 def ClearScreen():
     WholeWindow.glViewport()	
+    # green for debugging glClearColor(0, 255, 0, 0)
     glClear(GL_COLOR_BUFFER_BIT)
 
 # draw the complete image of the current page
@@ -3410,16 +3418,22 @@ def main():
 
     # initialize graphics
     pygame.init()
+    print "before detecting screen size"
+    print Fullscreen, UseAutoScreenSize
     if Fullscreen and UseAutoScreenSize:
         size = GetScreenSize()
         if size:
             ScreenWidth, ScreenHeight = size
+            print "Detected screen size: %dx%d pixels" % (ScreenWidth, ScreenHeight)
             print >>sys.stderr, "Detected screen size: %dx%d pixels" % (ScreenWidth, ScreenHeight)
     flags = OPENGL|DOUBLEBUF
     if Fullscreen:
         flags |= FULLSCREEN
     try:
-        pygame.display.set_mode((ScreenWidth, ScreenHeight), flags)
+	if Fullscreen and UseAutoScreenSize:
+	    pygame.display.set_mode((0,0), flags) # do not change the resolution - it is already OK
+	else:
+            pygame.display.set_mode((ScreenWidth, ScreenHeight), flags)
     except:
         print >>sys.stderr, "FATAL: cannot create rendering surface in the desired resolution (%dx%d)" % (ScreenWidth, ScreenHeight)
         sys.exit(1)
@@ -3710,6 +3724,7 @@ def main():
     DrawCurrentPage()
     UpdateCaption(Pcurrent)
     DrawPreviewNextSlide()
+    ClearScreen()
     TransitionTo(1)
     while True:
         HandleEvent(pygame.event.wait())
@@ -4094,6 +4109,7 @@ def ParseOptions(argv):
 		    projection, prompter = arg.split(",")
 		    ProjectionFrame = FrameCoordinates.parse(projection)
 		    PrompterWholeFrame = FrameCoordinates.parse(prompter)
+		    print "ProjectionFrame: ", ProjectionFrame
 		    print "PrompterWholeFrame: ", PrompterWholeFrame
 		    prompter_width = PrompterWholeFrame.width*9/10/2
 		    PrompterCurrentFrame = FrameCoordinates(
@@ -4103,7 +4119,7 @@ def ParseOptions(argv):
 		      PrompterWholeFrame.width-PrompterCurrentFrame.width)
 		    PrompterCurrentFrame.adjust_to_aspect_ratio((4,3), (5,3), (0,1))
 		    PrompterNextFrame.adjust_to_aspect_ratio((4,3), (5,3), (1,0))
-                UseAutoScreenSize = False
+                UseAutoScreenSize = True
             except:
                 opterr("invalid parameter for --dual-head")
         if opt in ("-R", "--meshres"):

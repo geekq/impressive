@@ -377,6 +377,7 @@ def analyze_pdf(filename):
     pdf = f.read()
     f.close()
     box = map(float, pdf.split("/MediaBox",1)[1].split("]",1)[0].split("[",1)[1].strip().split())
+    print "analyze_pdf ", (max(map(num, pdf.split("/Count")[1:])), box[2]-box[0], box[3]-box[1])
     return (max(map(num, pdf.split("/Count")[1:])), box[2]-box[0], box[3]-box[1])
 
 # unescape &#123; literals in PDF files
@@ -505,20 +506,41 @@ def Quit(code=0):
 
 ##### RENDERING TOOL CODE ######################################################
 class FrameCoordinates:
+    RESOLUTION_REGEX = re.compile(
+      r"(\d+)x(\d+)")
     GEOMETRY_REGEX = re.compile(
       r"""(\d+)x(\d+)    # resolution
           \+(\d+)\+(\d+) # offset""", re.VERBOSE)
 
     # offset_x, offset_y, width, height
 
-    def __init__(self, geometry): 
+    def __init__(self, width, height, offset_x=0, offset_y=0): 
+	self.width = width
+	self.height = height
+	self.offset_x = offset_x
+	self.offset_y = offset_y
+
+    @classmethod
+    def from_full_tuple(cls, value):
+        return cls(value[0], value[1], value[2], value[3])
+
+    @classmethod
+    def from_size_tuple(cls, value):
+        return cls(value[0], value[1])
+
+    @classmethod
+    def parse(cls, geometry): 
 	"""Creates new FrameCoordinates object by parsing a X11 like geometry string.
 	Example: 1024x768+1280+0"""
 	parsed = FrameCoordinates.GEOMETRY_REGEX.match(geometry)
-	if not parsed:
-	    raise ValueError, "Geometry string '%s' could not be parsed" % geometry
-	(self.width, self.height, self.offset_x, self.offset_y) = \
-	  [int(elem) for elem in parsed.groups()]
+	if parsed:
+	    return cls.from_full_tuple([int(elem) for elem in parsed.groups()])
+	else:
+	    parsed = FrameCoordinates.RESOLUTION_REGEX.match(geometry)
+	    if parsed:
+		return cls.from_size_tuple([int(elem) for elem in parsed.groups()])
+	    else:
+		raise ValueError, "Geometry string '%s' could not be parsed" % geometry
 
     def __repr__(self):
         return "size %d,%d offset %d,%d" % self.offset_x, self.offset_y, self.width, self.height
@@ -526,11 +548,22 @@ class FrameCoordinates:
     def as_tuple(self):
 	return (self.width, self.height, self.offset_x, self.offset_y)
 
+    def size(self):
+	return (self.width, self.height)
+
     def glViewport(self):
-	flViewport(self.offset_x, self.offset_y, self.width, self.height)
+	glViewport(self.offset_x, self.offset_y, self.width, self.height)
 
 # draw a fullscreen quad
 def DrawFullQuad():
+    glBegin(GL_QUADS)
+    glTexCoord2d(    0.0,     0.0);  glVertex2i(0, 0)
+    glTexCoord2d(TexMaxS,     0.0);  glVertex2i(1, 0)
+    glTexCoord2d(TexMaxS, TexMaxT);  glVertex2i(1, 1)
+    glTexCoord2d(    0.0, TexMaxT);  glVertex2i(0, 1)
+    glEnd()
+
+def DrawFullQuadProbe(): # TODO: probe for rendering twice
     glBegin(GL_QUADS)
     glTexCoord2d(    0.0,     0.0);  glVertex2d(0, 0)
     glTexCoord2d(TexMaxS,     0.0);  glVertex2d(0.5, 0)
@@ -1729,10 +1762,11 @@ def RenderPDF(page, MayAdjustResolution, ZoomMode):
 
     # if the image size is strange, re-adjust the rendering resolution
     if MayAdjustResolution \
+    and not DualHead \
     and ((abs(ScreenWidth  - DisplayWidth)  > 4) \
     or   (abs(ScreenHeight - DisplayHeight) > 4)):
-        newsize = ZoomToFit((DisplayWidth,DisplayHeight))
-        NewResolution = newsize[0] * Resolution/DisplayWidth
+	newsize = ZoomToFit((DisplayWidth,DisplayHeight))
+	NewResolution = newsize[0] * Resolution/DisplayWidth
         if abs(1.0 - NewResolution / Resolution) > 0.05:
             # only modify anything if the resolution deviation is large enough
             SetFileProp(SourceFile, 'res', NewResolution)
@@ -1815,8 +1849,9 @@ def PageImage(page, ZoomMode=False, RenderMode=False):
                                      (2 * ScreenHeight - img.size[1]) / 2))
         else:
             TextureImage = Image.new('RGB', (TexWidth, TexHeight))
-            x0 = (ScreenWidth  - img.size[0]) / 2
-            y0 = (ScreenHeight - img.size[1]) / 2
+	    print "TextureImage = ...; (TexWidth, TexHeight)=", (TexWidth, TexHeight), " img=", img.size
+            x0 = (ProjectionFrame.width  - img.size[0]) / 2
+            y0 = (ProjectionFrame.height - img.size[1]) / 2
             TextureImage.paste(img, (x0, y0))
             SetPageProp(page, '_box', (x0, y0, x0 + img.size[0], y0 + img.size[1]))
             FixHyperlinks(page)
@@ -1867,6 +1902,9 @@ def RenderPage(page, target):
     try:
         glTexImage2D(TextureTarget, 0, 3, TexWidth, TexHeight, 0,\
                      GL_RGB, GL_UNSIGNED_BYTE, PageImage(page))
+	# HACK: red background so we can see the problems better
+	glClearColor(255,0,0,0)
+	glClear(GL_COLOR_BUFFER_BIT)
     except GLerror:
         print >>sys.stderr, "I'm sorry, but your graphics card is not capable of rendering presentations"
         print >>sys.stderr, "in this resolution. Either the texture memory is exhausted, or there is no"
@@ -1901,8 +1939,13 @@ def RenderThread(p1, p2):
 
 def DoRender():
     global TexWidth, TexHeight
-    TexWidth = ScreenWidth
-    TexHeight = ScreenHeight
+    if DualHead:
+	TexWidth = ProjectionFrame.width
+        TexHeight = ProjectionFrame.height
+    else:
+	TexWidth = ScreenWidth
+        TexHeight = ScreenHeight
+
     if os.path.exists(RenderToDirectory):
         print >>sys.stderr, "Destination directory `%s' already exists," % RenderToDirectory
         print >>sys.stderr, "refusing to overwrite anything."
@@ -2130,9 +2173,20 @@ def DrawOverlays():
 # draw the complete image of the current page
 def DrawCurrentPage(dark=1.0, do_flip=True):
     if VideoPlaying: return
-    boxes = GetPageProp(Pcurrent, 'boxes')
     glClear(GL_COLOR_BUFFER_BIT)
 
+    if True: # TODO: DualHead
+	ProjectionFrame.glViewport()
+	DrawCurrentPageWorker(dark, do_flip)
+	PrompterCurrentFrame.glViewport()
+	DrawCurrentPageWorker(dark, do_flip)
+	WholeWindow.glViewport()	
+    else:
+	DrawCurrentPageWorker(dark, do_flip)
+
+
+def DrawCurrentPageWorker(dark=1.0, do_flip=True):
+    boxes = GetPageProp(Pcurrent, 'boxes')
     # pre-transform for zoom
     glLoadIdentity()
     glOrtho(ZoomX0, ZoomX0 + ZoomArea,  ZoomY0 + ZoomArea, ZoomY0,  -10.0, 10.0)
@@ -3315,6 +3369,21 @@ def main():
     global Extensions, AllowExtensions, TextureTarget, PAR, DAR, TempFileName
     global BackgroundRendering, FileStats, RTrunning, RTrestart, StartTime
     global CursorImage, CursorVisible, InfoScriptPath
+    # for dual head support
+    global ProjectionFrame, PrompterNextFrame, PrompterCurrentFrame, PrompterWholeFrame, WholeWindow 
+    global DualHead
+
+    # Dual head support
+    # TODO HACK currently hard coded for testing purposes
+    DualHead = True
+    if DualHead:
+        ProjectionFrame = FrameCoordinates.parse("800x600+800+0")
+	PrompterCurrentFrame = FrameCoordinates.parse("400x300+0+0")
+        WholeWindow = FrameCoordinates.parse("1600x800+0+0")
+    else:
+	# ProjectionFrame is the whole screen without dual head
+        ProjectionFrame = FrameCoordinates.from_size_tuple(ScreenWidth, ScreenHeight)
+        WholeWindow = FrameCoordinates.from_size_tuple(ScreenWidth, ScreenHeight)
 
     # allocate temporary file
     TempFileName = tempfile.mktemp(prefix="impressive-", suffix="_tmp")
@@ -3338,8 +3407,13 @@ def main():
                 pages, pdf_width, pdf_height = analyze_pdf(name)
                 if Rotation & 1:
                     pdf_width, pdf_height = (pdf_height, pdf_width)
-                res = min(ScreenWidth  * 72.0 / pdf_width, \
-                          ScreenHeight * 72.0 / pdf_height)
+		if DualHead:
+		    res = min(ProjectionFrame.width  * 72.0 / pdf_width, \
+			      ProjectionFrame.height * 72.0 / pdf_height)
+		else:
+		    res = min(ProjectionFrame.width  * 72.0 / pdf_width, \
+			      ProjectionFrame.height * 72.0 / pdf_height)
+		print "res = ", res
             except:
                 res = 72.0
 
@@ -3426,15 +3500,15 @@ def main():
     if AllowExtensions and ("texture_non_power_of_two" in Extensions):
         print >>sys.stderr, "Using GL_ARB_texture_non_power_of_two."
         TextureTarget = GL_TEXTURE_2D
-        TexWidth  = ScreenWidth
-        TexHeight = ScreenHeight
+        TexWidth = ProjectionFrame.width # was: ScreenWidth
+	TexHeight = ProjectionFrame.height # was: ScreenHeight
         TexMaxS = 1.0
         TexMaxT = 1.0
     elif AllowExtensions and ("texture_rectangle" in Extensions):
         print >>sys.stderr, "Using GL_ARB_texture_rectangle."
         TextureTarget = 0x84F5  # GL_TEXTURE_RECTANGLE_ARB
-        TexWidth  = ScreenWidth
-        TexHeight = ScreenHeight
+        TexWidth = ProjectionFrame.width # was: ScreenWidth
+	TexHeight = ProjectionFrame.height # was: ScreenHeight
         TexMaxS = ScreenWidth
         TexMaxT = ScreenHeight
     else:

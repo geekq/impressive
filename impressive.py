@@ -377,7 +377,6 @@ def analyze_pdf(filename):
     pdf = f.read()
     f.close()
     box = map(float, pdf.split("/MediaBox",1)[1].split("]",1)[0].split("[",1)[1].strip().split())
-    print "analyze_pdf ", (max(map(num, pdf.split("/Count")[1:])), box[2]-box[0], box[3]-box[1])
     return (max(map(num, pdf.split("/Count")[1:])), box[2]-box[0], box[3]-box[1])
 
 # unescape &#123; literals in PDF files
@@ -666,7 +665,7 @@ def GenerateSpotMesh():
 # Each transition is represented by a class derived from impressive.Transition
 # The interface consists of only two methods: the __init__ method may perform
 # some transition-specific initialization, and render() finally renders a frame
-# of the transition, using the global texture identifierst Tcurrent and Tnext.
+# of the transition, using the global texture identifiers Tcurrent and Tnext.
 
 # Transition itself is an abstract class
 class AbstractError(StandardError):
@@ -966,8 +965,7 @@ AvailableTransitions=[ # from coolest to lamest
 #    WipeBlobs,
 #    WipeCenterOut,WipeCenterIn,
 #    WipeDownRight,WipeUpLeft,WipeDown,WipeUp,WipeRight,WipeLeft,
-#    Crossfade
-    None
+    Crossfade
 ]
 
 
@@ -1690,8 +1688,8 @@ def DummyPage():
                           (ScreenHeight - LogoImage.size[1]) / 2))
     return img
 
-# load a page from a PDF file
 def RenderPDF(page, MayAdjustResolution, ZoomMode):
+    """loads a page from a PDF file and returns an Image object"""
     global UseGhostScript
     UseGhostScriptOnce = False
 
@@ -1874,7 +1872,6 @@ def PageImage(page, ZoomMode=False, RenderMode=False):
                                      (2 * ScreenHeight - img.size[1]) / 2))
         else:
             TextureImage = Image.new('RGB', (TexWidth, TexHeight))
-	    print "TextureImage = ...; (TexWidth, TexHeight)=", (TexWidth, TexHeight), " img=", img.size
             x0 = (ProjectionFrame.width  - img.size[0]) / 2
             y0 = (ProjectionFrame.height - img.size[1]) / 2
             TextureImage.paste(img, (x0, y0))
@@ -1927,9 +1924,6 @@ def RenderPage(page, target):
     try:
         glTexImage2D(TextureTarget, 0, 3, TexWidth, TexHeight, 0,\
                      GL_RGB, GL_UNSIGNED_BYTE, PageImage(page))
-	# HACK: red background so we can see the problems better
-	glClearColor(255,0,0,0)
-	glClear(GL_COLOR_BUFFER_BIT)
     except GLerror:
         print >>sys.stderr, "I'm sorry, but your graphics card is not capable of rendering presentations"
         print >>sys.stderr, "in this resolution. Either the texture memory is exhausted, or there is no"
@@ -2195,18 +2189,19 @@ def DrawOverlays():
         glDisable(GL_BLEND)
         glDisable(GL_TEXTURE_2D)
 
+def ClearScreen():
+    WholeWindow.glViewport()	
+    glClear(GL_COLOR_BUFFER_BIT)
+
 # draw the complete image of the current page
 def DrawCurrentPage(dark=1.0, do_flip=True):
     if VideoPlaying: return
-    glClear(GL_COLOR_BUFFER_BIT)
 
     if DualHead:
 	ProjectionFrame.glViewport()
 	DrawPageWorker(Tcurrent, dark, do_flip)
 	PrompterCurrentFrame.glViewport()
 	DrawPageWorker(Tcurrent, dark, do_flip)
-	PrompterNextFrame.glViewport()
-	DrawPageWorker(Tnext, dark, do_flip)
 	WholeWindow.glViewport()	
     else:
 	DrawPageWorker(Tcurrent, dark, do_flip)
@@ -2590,6 +2585,8 @@ def TransitionTo(page):
 
     # notify that the page has been left
     PageLeft()
+    
+    ProjectionFrame.glViewport()
 
     # box fade-out
     if GetPageProp(Pcurrent, 'boxes') or Tracing:
@@ -2657,7 +2654,15 @@ def TransitionTo(page):
     PageEntered()
     if not PreloadNextPage(GetNextPage(Pcurrent, 1)):
         PreloadNextPage(GetNextPage(Pcurrent, -1))
+
+    DrawPreviewNextSlide()
     return 1
+
+def DrawPreviewNextSlide():
+    if DualHead:
+	PrompterNextFrame.glViewport()
+	DrawPageWorker(Tnext, 1.0, True)
+	WholeWindow.glViewport()	
 
 # zoom mode animation
 def ZoomAnimation(targetx, targety, func):
@@ -3008,6 +3013,9 @@ def HandleOverviewEvent(event):
 def DoOverview():
     global Pcurrent, Pnext, Tcurrent, Tnext, Tracing, OverviewSelection
     global PageEnterTime, OverviewMode
+
+    if DualHead:
+	PrompterWholeFrame.glViewport
 
     pygame.time.set_timer(USEREVENT_PAGE_TIMEOUT, 0)
     PageLeft()
@@ -3456,7 +3464,6 @@ def main():
 		else:
 		    res = min(ProjectionFrame.width  * 72.0 / pdf_width, \
 			      ProjectionFrame.height * 72.0 / pdf_height)
-		print "res = ", res
             except:
                 res = 72.0
 
@@ -3701,6 +3708,8 @@ def main():
         pygame.mouse.set_visible(False)
     DrawCurrentPage()
     UpdateCaption(Pcurrent)
+    DrawPreviewNextSlide()
+    TransitionTo(1)
     while True:
         HandleEvent(pygame.event.wait())
 

@@ -542,7 +542,7 @@ class FrameCoordinates:
 		raise ValueError, "Geometry string '%s' could not be parsed" % geometry
 
     def __repr__(self):
-        return "size %d,%d offset %d,%d" % self.offset_x, self.offset_y, self.width, self.height
+        return "size %d,%d offset %d,%d" % (self.width, self.height, self.offset_x, self.offset_y)
 
     def as_tuple(self):
 	return (self.width, self.height, self.offset_x, self.offset_y)
@@ -2179,15 +2179,17 @@ def DrawCurrentPage(dark=1.0, do_flip=True):
 
     if DualHead:
 	ProjectionFrame.glViewport()
-	DrawCurrentPageWorker(dark, do_flip)
+	DrawPageWorker(Tcurrent, dark, do_flip)
 	PrompterCurrentFrame.glViewport()
-	DrawCurrentPageWorker(dark, do_flip)
+	DrawPageWorker(Tcurrent, dark, do_flip)
+	PrompterNextFrame.glViewport()
+	DrawPageWorker(Tnext, dark, do_flip)
 	WholeWindow.glViewport()	
     else:
-	DrawCurrentPageWorker(dark, do_flip)
+	DrawPageWorker(Tcurrent, dark, do_flip)
 
 
-def DrawCurrentPageWorker(dark=1.0, do_flip=True):
+def DrawPageWorker(T, dark=1.0, do_flip=True):
     boxes = GetPageProp(Pcurrent, 'boxes')
     # pre-transform for zoom
     glLoadIdentity()
@@ -2196,7 +2198,7 @@ def DrawCurrentPageWorker(dark=1.0, do_flip=True):
     # background layer -- the page's image, darkened if it has boxes
     glDisable(GL_BLEND)
     glEnable(TextureTarget)
-    glBindTexture(TextureTarget, Tcurrent)
+    glBindTexture(TextureTarget, T)
     if boxes or Tracing:
         light = 1.0 - 0.25 * dark
     else:
@@ -2632,6 +2634,13 @@ def TransitionTo(page):
     PageEntered()
     if not PreloadNextPage(GetNextPage(Pcurrent, 1)):
         PreloadNextPage(GetNextPage(Pcurrent, -1))
+    if DualHead: # show next page
+	print "PrompterNextFrame=", PrompterNextFrame
+	PrompterNextFrame.glViewport()
+	glClearColor(255,0,0,0)
+	glClear(GL_COLOR_BUFFER_BIT)
+	DrawCurrentPage()
+	WholeWindow.glViewport()	
     return 1
 
 # zoom mode animation
@@ -4061,6 +4070,9 @@ def ParseOptions(argv):
 		    PrompterWholeFrame = FrameCoordinates.parse(prompter)
 		    PrompterCurrentFrame = FrameCoordinates(
 		      PrompterWholeFrame.width/2, PrompterWholeFrame.height/2)
+		    PrompterNextFrame = FrameCoordinates(
+		      PrompterWholeFrame.width/2, PrompterWholeFrame.height/2,
+		      PrompterWholeFrame.width/2)
                 UseAutoScreenSize = False
             except:
                 opterr("invalid parameter for --dual-head")

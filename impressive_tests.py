@@ -22,6 +22,9 @@ class Geometry(unittest.TestCase):
         self.assertEquals(800, c.width)
         self.assertEquals(600, c.height)
 
+    def testStr(self):
+	c = impressive.FrameCoordinates.parse("800x600")
+	self.assertEquals("size 800,600 offset 0,0", str(c))
      
 if __name__ == "__main__":
       unittest.main()

@@ -514,19 +514,18 @@ class FrameCoordinates:
 
     # offset_x, offset_y, width, height
 
-    def __init__(self, width, height, offset_x=0, offset_y=0): 
-	self.width = width
-	self.height = height
-	self.offset_x = offset_x
-	self.offset_y = offset_y
-
-    @classmethod
-    def from_full_tuple(cls, value):
-        return cls(value[0], value[1], value[2], value[3])
-
-    @classmethod
-    def from_size_tuple(cls, value):
-        return cls(value[0], value[1])
+    def __init__(self, width=None, height=None, offset_x=0, offset_y=0, size_tuple=None, full_tuple=None): 
+	if full_tuple:
+	    self.__init__(full_tuple[0], full_tuple[1], full_tuple[2], full_tuple[3])
+	elif size_tuple:
+	    self.__init__(size_tuple[0], size_tuple[1], offset_x, offset_y)
+	elif width and height:
+	    self.width = width
+	    self.height = height
+	    self.offset_x = offset_x
+	    self.offset_y = offset_y
+	else:
+	    raise ValueError, "no size given"
 
     @classmethod
     def parse(cls, geometry): 
@@ -534,11 +533,11 @@ class FrameCoordinates:
 	Example: 1024x768+1280+0"""
 	parsed = FrameCoordinates.GEOMETRY_REGEX.match(geometry)
 	if parsed:
-	    return cls.from_full_tuple([int(elem) for elem in parsed.groups()])
+	    return cls(full_tuple=[int(elem) for elem in parsed.groups()])
 	else:
 	    parsed = FrameCoordinates.RESOLUTION_REGEX.match(geometry)
 	    if parsed:
-		return cls.from_size_tuple([int(elem) for elem in parsed.groups()])
+		return cls(size_tuple=[int(elem) for elem in parsed.groups()])
 	    else:
 		raise ValueError, "Geometry string '%s' could not be parsed" % geometry
 
@@ -550,6 +549,9 @@ class FrameCoordinates:
 
     def size(self):
 	return (self.width, self.height)
+
+    def offset(self):
+	return (self.offset_x, self.offset_y)
 
     def glViewport(self):
 	glViewport(self.offset_x, self.offset_y, self.width, self.height)
@@ -3396,10 +3398,10 @@ def main():
     if (Gamma <> 1.0) or (BlackLevel <> 0):
         SetGamma(force=True)
 
-    WholeWindow = FrameCoordinates.from_size_tuple((ScreenWidth, ScreenHeight))
+    WholeWindow = FrameCoordinates(ScreenWidth, ScreenHeight)
     # defaults for single head - whole screen
     if not DualHead:
-        ProjectionFrame = FrameCoordinates.from_size_tuple(ScreenWidth, ScreenHeight)
+        ProjectionFrame = FrameCoordinates(ScreenWidth, ScreenHeight)
 
     # allocate temporary file
     TempFileName = tempfile.mktemp(prefix="impressive-", suffix="_tmp")
@@ -4057,9 +4059,8 @@ def ParseOptions(argv):
 		    projection, prompter = arg.split(",")
 		    ProjectionFrame = FrameCoordinates.parse(projection)
 		    PrompterWholeFrame = FrameCoordinates.parse(prompter)
-		    PrompterCurrentFrame = FrameCoordinates.from_full_tuple(PrompterWholeFrame.as_tuple())
-		    PrompterCurrentFrame.width = PrompterWholeFrame.width/2
-		    PrompterCurrentFrame.height = PrompterWholeFrame.height/2
+		    PrompterCurrentFrame = FrameCoordinates(
+		      PrompterWholeFrame.width/2, PrompterWholeFrame.height/2)
                 UseAutoScreenSize = False
             except:
                 opterr("invalid parameter for --dual-head")

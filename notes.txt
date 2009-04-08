@@ -1,0 +1,7 @@
+Notes
+=====
+
+To observe the behaviour of the existing side-effect based implementation one
+can use glGetIntegerv(GLenum pname, GLint* param) family of functions to query
+the state of the OpenGL state machine.
+

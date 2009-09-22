@@ -1,0 +1,18 @@
+Plan for 2009-2010
+==================
+
+Completely rewrite with
+* ruby-processing
+* ruby-opengl
+
+Features:
+--------
+* on minimize switch dual monitor into clone mode 
+* on focus switch to "prompter" mode (preview next slide on notebook) again
+
+Create special DSL:
+------------------
+* better than wiki2beamer
+* translate with ANTLR to latex
+* use 2 empty lines to separate slide
+* set (increase) font size easily
